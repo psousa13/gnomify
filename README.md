@@ -11,14 +11,18 @@
 ![License](https://img.shields.io/github/license/psousa13/gnomify?style=flat-square)
 ![Version](https://img.shields.io/badge/version-1.0.0-brightgreen?style=flat-square)
 
-<!-- Replace with your screenshot -->
-![Gnomify in action](assets/screenshot.png)
+<img src="assets/screenshot-topbar.png" alt="Gnomify in the top bar" width="100%">
 
 </div>
 
 ---
 
 Gnomify brings Spotify into your GNOME panel — shows the current track, cover art, and playback controls. Disappears automatically when Spotify is closed.
+
+## Preview
+
+<img src="assets/screenshot-panel.png" alt="Panel label" width="400">
+<img src="assets/screenshot-popup.png" alt="Dropdown menu" width="300">
 
 ## Features
 
