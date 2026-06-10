@@ -1,15 +1,52 @@
-# Gnomify — Spotify Controls for GNOME 50
+<div align="center">
 
-A GNOME Shell extension that brings Spotify into your top panel: current track, cover art, and playback controls. Built using the **MPRIS2 D-Bus interface**.
+<!-- Replace with your logo once ready -->
+<!-- <img src="assets/logo.png" width="120" alt="Gnomify Logo"> -->
+
+# Gnomify
+
+**Spotify controls for the GNOME 50 panel**
+
+![GNOME](https://img.shields.io/badge/GNOME-45--50-4A86CF?style=flat-square&logo=gnome&logoColor=white)
+![License](https://img.shields.io/github/license/psousa13/gnomify?style=flat-square)
+![Version](https://img.shields.io/badge/version-1.0.0-brightgreen?style=flat-square)
+
+<!-- Replace with your screenshot -->
+![Gnomify in action](assets/screenshot.png)
+
+</div>
+
+---
+
+Gnomify brings Spotify into your GNOME panel — shows the current track, cover art, and playback controls. Disappears automatically when Spotify is closed.
 
 ## Features
+
 - Live track title + artist display in the top panel
 - Dropdown menu with cover art, track info, and playback controls
 - Play / pause / next / previous buttons
 - Buttons auto-dim when an action isn't available
 - Automatically appears and disappears with Spotify
 
+## Installation
+
+[Download the files](https://github.com/psousa13/gnomify/archive/refs/heads/main.zip) and extract them to `~/.local/share/gnome-shell/extensions/gnomify@psousa13`, or clone the repository:
+
+```bash
+git clone https://github.com/psousa13/gnomify.git ~/.local/share/gnome-shell/extensions/gnomify@psousa13
+```
+
+Then compile the schema and enable the extension:
+
+```bash
+glib-compile-schemas ~/.local/share/gnome-shell/extensions/gnomify@psousa13/schemas/
+gnome-extensions enable gnomify@psousa13
+```
+
+Restart GNOME Shell to apply — on Wayland log out and back in, on X11 press `Alt+F2`, type `r` and hit Enter.
+
 ## Files
+
 | File | Purpose |
 |------|---------|
 | `metadata.json` | Extension manifest (UUID, supported shell versions) |
@@ -19,22 +56,13 @@ A GNOME Shell extension that brings Spotify into your top panel: current track, 
 | `stylesheet.css` | Panel and menu styling |
 | `schemas/*.gschema.xml` | GSettings schema |
 
-## Install (manual)
-```bash
-# 1. Copy the folder into your local extensions directory
-cp -r "gnomify@psousa13" ~/.local/share/gnome-shell/extensions/
-
-# 2. Compile the settings schema
-glib-compile-schemas ~/.local/share/gnome-shell/extensions/gnomify@psousa13/schemas/
-
-# 3. Restart GNOME Shell
-#    - Wayland: log out and back in
-#    - X11: press Alt+F2, type "r", press Enter
-
-# 4. Enable the extension
-gnome-extensions enable gnomify@psousa13
-```
-
 ## Notes
+
 - Open Spotify and start playback — Gnomify will appear in the panel automatically.
 - Spotify's Linux clients (official deb/snap/flatpak) all expose MPRIS by default, so no extra configuration is needed.
+
+---
+
+<div align="center">
+  <sub>Made by <a href="https://github.com/psousa13">psousa13</a></sub>
+</div>
