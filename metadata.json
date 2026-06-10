@@ -1,0 +1,10 @@
+{
+  "uuid": "gnomify@psousa13",
+  "name": "Gnomify",
+  "description": "Brings Spotify into your GNOME panel — shows the current track, cover art, and playback controls. Disappears automatically when Spotify is closed.",
+  "version-name": "1.0.0",
+  "shell-version": ["45", "46", "47", "48", "49", "50"],
+  "url": "https://github.com/psousa13/gnomify",
+  "settings-schema": "org.gnome.shell.extensions.gnomify",
+  "gettext-domain": "gnomify"
+}

@@ -1,0 +1,53 @@
+/* stylesheet.css — Spotify Media Controls */
+
+.spotify-panel-box {
+  spacing: 4px;
+}
+
+.spotify-panel-label {
+  font-size: 0.85em;
+  padding: 0 2px;
+}
+
+/* ── Popup ─────────────────────────────────────────────── */
+
+.spotify-top-box {
+  spacing: 10px;
+  padding: 4px 2px 4px 2px;
+}
+
+.spotify-art {
+  width: 48px;
+  height: 48px;
+  border-radius: 4px;
+  /* clip corners on the texture */
+  background-size: cover;
+}
+
+.spotify-info-box {
+  spacing: 3px;
+}
+
+.spotify-title {
+  font-weight: bold;
+  font-size: 0.95em;
+}
+
+.spotify-artist {
+  font-size: 0.82em;
+  color: #a0a0a0;
+}
+
+.spotify-controls-box {
+  spacing: 10px;
+  padding: 2px 0 4px 0;
+}
+
+.spotify-menu-control {
+  padding: 6px;
+  border-radius: 999px;
+}
+
+.spotify-menu-control:hover {
+  background-color: rgba(255, 255, 255, 0.12);
+}
