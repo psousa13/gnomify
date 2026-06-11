@@ -1,6 +1,4 @@
 // extension.js — Gnomify (GNOME 45-50)
-// Spotify panel controls: track label, cover art, playback buttons.
-// Hides entirely when Spotify is not running.
 
 import St from 'gi://St';
 import Clutter from 'gi://Clutter';
@@ -24,8 +22,7 @@ function loadArtAsync(url, callback) {
     file.load_contents_async(null, (f, res) => {
       try {
         const [, data] = f.load_contents_finish(res);
-        const bytes = GLib.Bytes.new(data);
-        callback(Gio.BytesIcon.new(bytes));
+        callback(Gio.BytesIcon.new(GLib.Bytes.new(data)));
       } catch (_) { callback(null); }
     });
   } catch (_) { callback(null); }
@@ -33,11 +30,14 @@ function loadArtAsync(url, callback) {
 
 const GnomifyIndicator = GObject.registerClass(
   class GnomifyIndicator extends PanelMenu.Button {
-    _init() {
+    _init(settings, extensionPath) {
       super._init(0.5, 'Gnomify');
-      this._lastArtUrl = null;
+      this._settings      = settings;
+      this._extensionPath = extensionPath;
+      this._lastArtUrl    = null;
+      this._settingsId    = null;
 
-      // ── Panel bar ─────────────────────────────────────────────────────────
+      // ── Panel bar ─────────────────────────────────────────────────────
       this._box = new St.BoxLayout({
         style_class: 'panel-status-menu-box spotify-panel-box',
         x_align: Clutter.ActorAlign.CENTER,
@@ -45,9 +45,12 @@ const GnomifyIndicator = GObject.registerClass(
       });
       this.add_child(this._box);
 
+      // Spotify logo from SVG file
+      const logoFile = Gio.File.new_for_path(`${extensionPath}/spotify-logo.svg`);
+      const logoIcon = new Gio.FileIcon({ file: logoFile });
       this._icon = new St.Icon({
-        icon_name: 'audio-x-generic-symbolic',
-        style_class: 'system-status-icon',
+        gicon: logoIcon,
+        style_class: 'system-status-icon spotify-logo',
       });
       this._box.add_child(this._icon);
 
@@ -58,19 +61,24 @@ const GnomifyIndicator = GObject.registerClass(
       });
       this._box.add_child(this._panelLabel);
 
-      // ── Popup menu ────────────────────────────────────────────────────────
+      // ── Popup menu ─────────────────────────────────────────────────────
       this._buildMenu();
 
-      // ── MPRIS ─────────────────────────────────────────────────────────────
-      this._manager = new MprisManager();
+      // ── MPRIS ──────────────────────────────────────────────────────────
+      this._manager   = new MprisManager();
       this._managerId = this._manager.connect('player-changed', () => this._sync());
 
+      // ── Settings watcher ───────────────────────────────────────────────
+      this._settingsId = this._settings.connect('changed', () => this._applyStyle());
+
+      this._applyStyle();
       this._sync();
     }
 
     _buildMenu() {
+      // Top row: cover art + track info
       this._topItem = new PopupMenu.PopupBaseMenuItem({ reactive: false, can_focus: false });
-      const topBox = new St.BoxLayout({ style_class: 'spotify-top-box' });
+      const topBox  = new St.BoxLayout({ style_class: 'spotify-top-box' });
 
       this._artTexture = new St.Icon({
         icon_name: 'audio-x-generic-symbolic',
@@ -85,13 +93,14 @@ const GnomifyIndicator = GObject.registerClass(
       infoBox.add_child(this._titleLabel);
       infoBox.add_child(this._artistLabel);
       topBox.add_child(infoBox);
-
       this._topItem.add_child(topBox);
       this.menu.addMenuItem(this._topItem);
+
       this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
 
+      // Controls row
       this._controlsItem = new PopupMenu.PopupBaseMenuItem({ reactive: false, can_focus: false });
-      const controlsBox = new St.BoxLayout({
+      const controlsBox  = new St.BoxLayout({
         x_expand: true,
         x_align: Clutter.ActorAlign.CENTER,
         style_class: 'spotify-controls-box',
@@ -99,7 +108,7 @@ const GnomifyIndicator = GObject.registerClass(
 
       this._menuPrev = this._makeBtn('media-skip-backward-symbolic', () => this._withPlayer(p => p.previous()));
       this._menuPlay = this._makeBtn('media-playback-start-symbolic', () => this._withPlayer(p => p.playPause()));
-      this._menuNext = this._makeBtn('media-skip-forward-symbolic',  () => this._withPlayer(p => p.next()));
+      this._menuNext = this._makeBtn('media-skip-forward-symbolic',   () => this._withPlayer(p => p.next()));
 
       controlsBox.add_child(this._menuPrev);
       controlsBox.add_child(this._menuPlay);
@@ -123,6 +132,32 @@ const GnomifyIndicator = GObject.registerClass(
       if (p?.available) fn(p);
     }
 
+    // Apply transparent or solid style to the popup box
+    _applyStyle() {
+      const isTransparent = this._settings.get_string('popup-style') === 'transparent';
+      const alpha         = this._settings.get_double('transparency');
+
+      const menuBox = this.menu.box;
+      if (!menuBox) return;
+
+      if (isTransparent) {
+        // rgba background with blur hint — Tahoe-inspired frosted glass
+        const r = Math.round(alpha * 255);
+        menuBox.style = `
+          background-color: rgba(20, 20, 20, ${alpha});
+          border: 1px solid rgba(255, 255, 255, 0.12);
+          border-radius: 14px;
+        `;
+        // Force light text for transparent mode
+        menuBox.add_style_class_name('gnomify-transparent');
+        menuBox.remove_style_class_name('gnomify-solid');
+      } else {
+        menuBox.style = '';
+        menuBox.add_style_class_name('gnomify-solid');
+        menuBox.remove_style_class_name('gnomify-transparent');
+      }
+    }
+
     _sync() {
       const player = this._manager?.activePlayer;
 
@@ -136,8 +171,8 @@ const GnomifyIndicator = GObject.registerClass(
       const isPlaying = player.status === 'Playing';
 
       const panelText = artist ? `${title} — ${artist}` : title;
-      this._panelLabel.text    = panelText;
-      this._panelLabel.visible = panelText.length > 0;
+      this._panelLabel.text    = panelText ?? '';
+      this._panelLabel.visible = (panelText?.length ?? 0) > 0;
 
       this._titleLabel.text     = title  || '—';
       this._artistLabel.text    = artist || '';
@@ -165,17 +200,15 @@ const GnomifyIndicator = GObject.registerClass(
           }
         });
       }
+
+      // Re-apply style in case menu box wasn't ready earlier
+      this._applyStyle();
     }
 
     destroy() {
-      if (this._managerId && this._manager) {
-        this._manager.disconnect(this._managerId);
-        this._managerId = null;
-      }
-      if (this._manager) {
-        this._manager.destroy();
-        this._manager = null;
-      }
+      if (this._settingsId) { this._settings.disconnect(this._settingsId); this._settingsId = null; }
+      if (this._managerId && this._manager) { this._manager.disconnect(this._managerId); this._managerId = null; }
+      if (this._manager) { this._manager.destroy(); this._manager = null; }
       super.destroy();
     }
   }
@@ -183,14 +216,13 @@ const GnomifyIndicator = GObject.registerClass(
 
 export default class GnomifyExtension extends Extension {
   enable() {
-    this._indicator = new GnomifyIndicator();
+    this._settings  = this.getSettings();
+    this._indicator = new GnomifyIndicator(this._settings, this.path);
     Main.panel.addToStatusArea(this.uuid, this._indicator);
   }
 
   disable() {
-    if (this._indicator) {
-      this._indicator.destroy();
-      this._indicator = null;
-    }
+    if (this._indicator) { this._indicator.destroy(); this._indicator = null; }
+    this._settings = null;
   }
 }

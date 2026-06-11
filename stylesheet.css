@@ -1,7 +1,13 @@
-/* stylesheet.css — Spotify Media Controls */
+/* stylesheet.css — Gnomify */
+
+/* ── Panel bar ────────────────────────────────────────────────────────── */
 
 .spotify-panel-box {
-  spacing: 4px;
+  spacing: 5px;
+}
+
+.spotify-logo {
+  color: #1DB954; /* Spotify green */
 }
 
 .spotify-panel-label {
@@ -9,19 +15,17 @@
   padding: 0 2px;
 }
 
-/* ── Popup ─────────────────────────────────────────────── */
+/* ── Popup — shared ───────────────────────────────────────────────────── */
 
 .spotify-top-box {
   spacing: 10px;
-  padding: 4px 2px 4px 2px;
+  padding: 6px 4px 4px 4px;
 }
 
 .spotify-art {
   width: 48px;
   height: 48px;
-  border-radius: 4px;
-  /* clip corners on the texture */
-  background-size: cover;
+  border-radius: 6px;
 }
 
 .spotify-info-box {
@@ -40,14 +44,45 @@
 
 .spotify-controls-box {
   spacing: 10px;
-  padding: 2px 0 4px 0;
+  padding: 2px 0 6px 0;
 }
 
 .spotify-menu-control {
-  padding: 6px;
+  padding: 7px;
   border-radius: 999px;
 }
 
 .spotify-menu-control:hover {
   background-color: rgba(255, 255, 255, 0.12);
+}
+
+/* ── Popup — transparent mode ────────────────────────────────────────── */
+
+.gnomify-transparent .popup-menu-item {
+  background-color: transparent;
+}
+
+.gnomify-transparent .popup-menu-item:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+.gnomify-transparent .popup-separator-menu-item .popup-separator-menu-item-separator {
+  background-color: rgba(255, 255, 255, 0.12);
+}
+
+/* Force white text in transparent mode so it reads on dark backgrounds */
+.gnomify-transparent StLabel {
+  color: #ffffff;
+}
+
+.gnomify-transparent .spotify-artist {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.gnomify-transparent .spotify-menu-control {
+  color: #ffffff;
+}
+
+.gnomify-transparent .spotify-menu-control:hover {
+  background-color: rgba(255, 255, 255, 0.15);
 }
