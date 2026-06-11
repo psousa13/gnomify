@@ -23,7 +23,6 @@ Gnomify brings Spotify into your GNOME panel — shows the current track, cover 
 
 **Solid mode** (follows system theme)
 
-<img src="assets/screenshot-panel.png" alt="Panel label" width="400">
 <img src="assets/screenshot-popup.png" alt="Dropdown menu" width="300">
 
 **Transparent mode** (frosted glass)
